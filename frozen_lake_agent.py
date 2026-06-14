@@ -22,13 +22,12 @@ def train_agent():
         
         while not done:
             # ==========================================
-            # TODO 1: Implement Epsilon-Greedy Action Selection
-            # Hint: Generate a random number using np.random.uniform(0, 1). 
-            # If it's less than epsilon, choose a random action (env.action_space.sample()).
-            # Otherwise, choose the action with the highest Q-value for the current state (np.argmax).
+            # TODO 1: Epsilon-Greedy Action Selection
             # ==========================================
-            action = 0 # Replace this line!
-            
+            if np.random.uniform(0, 1) < epsilon:
+                action = env.action_space.sample()   # Explore: random action
+            else:
+                action = np.argmax(q_table[state])   # Exploit: best known action
             
             # Take the action
             next_state, reward, terminated, truncated, _ = env.step(action)
@@ -36,11 +35,12 @@ def train_agent():
 
             # ==========================================
             # TODO 2: The Bellman Equation Update
-            # Update q_table[state, action] using alpha, gamma, the reward, and the max Q-value of the next_state.
+            # Q(s,a) <- Q(s,a) + alpha * [R + gamma * max_a' Q(s',a') - Q(s,a)]
             # ==========================================
-            pass # Replace this line!
+            q_table[state, action] = q_table[state, action] + alpha * (
+                reward + gamma * np.max(q_table[next_state]) - q_table[state, action]
+            )
 
-            
             state = next_state
             
         # Decay exploration rate
